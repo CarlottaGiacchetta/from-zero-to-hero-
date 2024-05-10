@@ -3,7 +3,8 @@ import numpy as np
 import matplotlib.pyplot as plt
 import torch
 
-from utils import Value, draw_dot, lol, Layer, Neuron, MLP
+from utils import Value, draw_dot, lol
+from classe import Layer, Neuron, MLP
 
 #input
 x1 = torch.Tensor( [2.0] ).double();    x1.requires_grad = True #con double da float32 diventa float64    

@@ -17,23 +17,29 @@ x2w2 = x2*w2; x2w2.label = 'x2*w2'
 x1w1x2w2 = x1w1 + x2w2; x1w1x2w2.label = 'x1*w1 + x2*w2'
 n = x1w1x2w2 + b; n.label = 'n'
 o = n.tanh(); o.label = 'o'
-o.grad = 1.0
-n.grad = 0.5 #lo calcoli facendo la derivata do/dn = 1 - o**2
-x1w1x2w2.grad = 0.5 #perch ec'è la somma
-b.grad = 0.5 #perch ec'è la somma
-x1w1.grad = 0.5
-x2w2.grad = 0.5
+o.backward()
+draw_dot(o).render('output_tanh', view=True)
 
+
+x1w1 = x1*w1; x1w1.label = 'x1*w1'
+x2w2 = x2*w2; x2w2.label = 'x2*w2'
+x1w1x2w2 = x1w1 + x2w2; x1w1x2w2.label = 'x1*w1 + x2*w2'
+n = x1w1x2w2 + b; n.label = 'n'
+#----- #cambiamo qui --> rompi la tanh in due equ. equivalenti --> dovremmo ottenre gli stessi riusltati ma un grafo più lungo
+e = (2*n).exp(); e.label = 'e' 
+o = (e-1)/(e+1); o.label = 'o' 
+#-----
+o.backward()
+draw_dot(o).render('output_tanh1', view=True)
+
+
+
+
+'''
 x1.grad = w1.data * x1w1.grad
 w1.grad = x1.data * x1w1.grad
-
 x2.grad = w2.data * x2w2.grad
 w2.grad = x2.data * x2w2.grad
-
-draw_dot(o).render('output0', view=True)
-
-
-o.grad = 1.0
 o._backward() #propaga questo a tanh
 draw_dot(o).render('output1', view=True)
 n._backward()
@@ -41,8 +47,12 @@ b._backward()
 x1w1x2w2._backward()
 x1w1._backward()
 x2w2._backward()
-
-
-
+o.backward()
 draw_dot(o).render('output2', view=True)
+'''
+
+
+
+
+
 

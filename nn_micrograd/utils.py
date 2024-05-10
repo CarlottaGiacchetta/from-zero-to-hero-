@@ -1,5 +1,6 @@
 from graphviz import Digraph 
 import os
+import math
 
 def trace(root):
     #costruisci un set di tutti i nodi e gli archi del grafo
@@ -15,9 +16,6 @@ def trace(root):
 
 def draw_dot(root):
 
-    
-
-
     # Add the path to Graphviz bin to the PATH environment variable
     os.environ["PATH"] += os.pathsep + r'C:\Users\carlo\Downloads\windows_10_cmake_Release_Graphviz-11.0.0-win64\Graphviz-11.0.0-win64\bin'
     dot = Digraph(format = 'png', graph_attr = {'rankdir' : 'LR'}, engine='dot') #LR = Left to Right
@@ -25,7 +23,7 @@ def draw_dot(root):
     for n in nodes:
         uid = str(id(n))
         #per ogni valore del grafo crea un rettangolo
-        dot.node(name = uid, label = "{data %.4f}" % (n.data, ), shape = 'recod')
+        dot.node(name = uid, label = "{ %s | data %.4f | grad %.4f }" % (n.label, n.data, n.grad), shape = 'recod')
         if n._op:
             #se il valore è il risultato di qualche operazione crea il nodo per l'operaizone
             dot.node(name = uid + n._op, label = n._op)
@@ -35,13 +33,38 @@ def draw_dot(root):
     return dot
 
 
+def lol(): #gradient check (aggiungi h dove vuoi calcolare la derivata)
 
+    h = 0.0001
+    a = Value(2.0, label = 'a')
+    b = Value(-3.0, label = 'b')
+    c = Value(10.0, label = 'c')
+    e = a*b; e.label = 'e'
+    d = e + c; d.label = 'd'
+    f = Value(-2.0, label = 'f')
+    L = d * f; label = 'L'
+    L1 = L.data
+
+    a = Value(2.0 + h, label = 'a')
+    b = Value(-3.0, label = 'b')
+    c = Value(10.0, label = 'c')
+    e = a*b; e.label = 'e'
+    d = e + c; d.label = 'd'
+    f = Value(-2.0, label = 'f')
+    L = d * f; label = 'L'
+    L2 = L.data + h
+
+    print((L2 - L1)/h)
 
 class Value:
-    def __init__(self, data, _children = (), _op = ''):
+    def __init__(self, data, _children = (), _op = '', label = ''):
         self.data = data
         self._prev = set(_children) #è il set dei figli
         self._op = _op
+        self._backward = lambda: None #di default non fa nulla
+        self.label = label
+        self.grad = 0
+        
 
 
     def __repr__(self):
@@ -52,11 +75,35 @@ class Value:
 
     def __add__(self, other):
         out = Value(self.data + other.data, (self, other), '+')
+
+        def _backward():
+            self.grad = 1.0 * out.grad
+            other.grad = 1.0 * out.grad
+        out._backward = _backward
+
         return out #return a new value
 
     def __mul__(self, other):
         out = Value(self.data * other.data, (self, other), '*')
+
+        def _backward():
+            self.grad = other.data * out.grad
+            other.grad = self.data * out.grad
+        out._backward = _backward
+
         return out #return a new value
+
+    def tanh(self):
+        n = self.data
+        t = (math.exp(2*n) - 1) / (math.exp(2*n) + 1)
+        out = Value(t, (self, ), 'tanh')
+
+        def _backward():
+            self.grad = (1- t**2) * out.grad
+        out._backward = _backward
+        return out
+
+
     
 
 

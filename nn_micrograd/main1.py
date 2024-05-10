@@ -18,4 +18,4 @@ print(f'd è calcolata sulla base della {d._op} di questi due valori {d._prev} (
 
 
 gugu = draw_dot(d)
-gugu.render('output.png', view=True)
+gugu.render('output', view=True)

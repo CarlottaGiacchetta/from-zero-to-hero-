@@ -1,4 +1,5 @@
 from graphviz import Digraph 
+import os
 
 def trace(root):
     #costruisci un set di tutti i nodi e gli archi del grafo
@@ -13,7 +14,13 @@ def trace(root):
     return nodes, edges
 
 def draw_dot(root):
-    dot = Digraph(format = 'svg', graph_attr = {'rankdir' : 'LR'}) #LR = Left to Right
+
+    
+
+
+    # Add the path to Graphviz bin to the PATH environment variable
+    os.environ["PATH"] += os.pathsep + r'C:\Users\carlo\Downloads\windows_10_cmake_Release_Graphviz-11.0.0-win64\Graphviz-11.0.0-win64\bin'
+    dot = Digraph(format = 'png', graph_attr = {'rankdir' : 'LR'}, engine='dot') #LR = Left to Right
     nodes, edges = trace(root)
     for n in nodes:
         uid = str(id(n))
